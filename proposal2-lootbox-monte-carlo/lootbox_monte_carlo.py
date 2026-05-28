@@ -434,10 +434,10 @@ def main():
     print(f"Cost basis:      {PARAMS.cost_basis:.0%} of FMV")
     print()
 
-    print("[1/4] Per-box sims...")
+    print("[1/7] Per-box sims...")
     boxes = simulate_boxes(PARAMS, PARAMS.n_per_box_sims, rng)
 
-    print("[2/4] Campaign sims...")
+    print("[2/7] Campaign sims...")
     campaigns = simulate_campaigns(PARAMS, rng)
 
     stats = summary_stats(PARAMS, boxes, campaigns)
@@ -446,17 +446,17 @@ def main():
     print(stats.to_string())
     print()
 
-    print("[3/4] Plots...")
+    print("[3/7] Plots...")
     plot_margin_distribution(boxes, PARAMS, out_dir / 'margin_distribution.png')
     plot_cumulative_paths(campaigns, PARAMS, out_dir / 'cumulative_paths.png')
 
-    print("[4/5] Sweeps + sensitivity...")
+    print("[4/7] Haircut sweep...")
     haircuts = np.linspace(0.01, 0.20, 20)
     h_df = haircut_sweep(PARAMS, haircuts, rng)
     h_df.to_csv(out_dir / 'haircut_sweep.csv', index=False)
     plot_haircut_sweep(h_df, out_dir / 'haircut_sweep.png')
 
-    print("[5/5] Box price sweep (finding break-even)...")
+    print("[5/7] Box price sweep (finding break-even)...")
     prices = np.linspace(45, 70, 26)
     bp_df = box_price_sweep(PARAMS, prices, rng)
     bp_df.to_csv(out_dir / 'box_price_sweep.csv', index=False)
@@ -471,11 +471,13 @@ def main():
         print(f"    Implied house edge: {be_row['implied_house_edge_pct']:.1f}%")
         print(f"    P(user profitable): {be_row['p_user_profitable']:.1%}")
 
+    print("[6/7] Buyback-rate sweep...")
     scales = np.linspace(0.3, 2.0, 18)
     b_df = buyback_rate_sweep(PARAMS, scales, rng)
     b_df.to_csv(out_dir / 'buyback_sweep.csv', index=False)
     plot_buyback_sweep(b_df, out_dir / 'buyback_sweep.png')
 
+    print("[7/7] Sensitivity tornado...")
     t_df = sensitivity_tornado(PARAMS, rng)
     t_df.to_csv(out_dir / 'sensitivity_tornado.csv', index=False)
     plot_tornado(t_df, out_dir / 'sensitivity_tornado.png')
