@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rarible Multi-Collection Gacha v2 — Pre-Sale Design</title>
+<style>
+  :root {
+    --bg:        #fafafa;
+    --bg-panel:  #ffffff;
+    --fg:        #1d1f23;
+    --fg-soft:   #586069;
+    --accent:    #185fa5;
+    --accent-2:  #1d9e75;
+    --warn:      #d85a30;
+    --danger:    #e24b4a;
+    --border:    #e3e6ea;
+    --code-bg:   #f4f6f8;
+    --thead-bg:  #f0f4f9;
+    --row-alt:   #fafbfd;
+    --pos:       #1d9e75;
+    --neg:       #d85a30;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.55; }
+  body { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  nav.sidebar {
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px 24px 24px;
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    font-size: 13.5px;
+  }
+  nav.sidebar h1 {
+    font-size: 14px; font-weight: 600; color: var(--fg-soft);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin: 0 0 12px 0;
+  }
+  nav.sidebar .badge {
+    display: inline-block; background: var(--accent); color: white;
+    font-size: 10px; padding: 2px 6px; border-radius: 3px;
+    margin-left: 4px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  nav.sidebar a {
+    display: block; padding: 6px 10px; margin: 1px 0;
+    border-radius: 6px; color: var(--fg); text-decoration: none;
+    border-left: 2px solid transparent;
+  }
+  nav.sidebar a:hover { background: var(--thead-bg); }
+  nav.sidebar a.active {
+    color: var(--accent); border-left-color: var(--accent);
+    background: var(--thead-bg); font-weight: 600;
+  }
+  nav.sidebar a.highlight { color: var(--accent); font-weight: 600; }
+  nav.sidebar .grp { margin-top: 16px; color: var(--fg-soft); font-size: 11.5px;
+    text-transform: uppercase; letter-spacing: 0.05em; padding-left: 10px;}
+
+  main {
+    max-width: 1080px;
+    padding: 36px 56px 96px 56px;
+  }
+  main header { padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  main header h1 { font-size: 28px; margin: 0 0 8px 0; }
+  main header .meta { color: var(--fg-soft); font-size: 13.5px; }
+  main header .v-tag {
+    display: inline-block; background: var(--accent); color: white;
+    font-size: 11px; padding: 2px 8px; border-radius: 3px;
+    margin-left: 8px; vertical-align: middle; font-weight: 600;
+  }
+
+  section { margin: 56px 0; scroll-margin-top: 24px; }
+  section.hero { margin-top: 0; }
+  section h2 { font-size: 22px; margin: 0 0 14px 0; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border); }
+  section h3 { font-size: 17px; margin: 28px 0 10px 0; color: var(--fg); }
+
+  p { margin: 10px 0; }
+  em { color: var(--fg-soft); font-style: italic; }
+
+  ul, ol { padding-left: 24px; }
+  li { margin: 4px 0; }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    margin: 14px 0 18px 0; font-size: 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--thead-bg); font-weight: 600; font-size: 13px; color: var(--fg); }
+  tbody tr:nth-child(2n) { background: var(--row-alt); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td strong, th strong { color: var(--accent); }
+
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin: 18px 0 24px 0;
+  }
+  .kpi {
+    background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .kpi .label { font-size: 12px; color: var(--fg-soft); text-transform: uppercase;
+    letter-spacing: 0.04em; }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--accent); }
+  .kpi .sub { font-size: 12px; color: var(--fg-soft); margin-top: 2px; }
+  .kpi.pos .value { color: var(--pos); }
+  .kpi.warn .value { color: var(--warn); }
+  .kpi.danger .value { color: var(--danger); }
+
+  blockquote {
+    border-left: 3px solid var(--accent); background: var(--thead-bg);
+    margin: 14px 0; padding: 10px 18px;
+    color: var(--fg);
+  }
+  .callout {
+    background: #fff8e1; border-left: 3px solid #f5a623;
+    padding: 12px 16px; margin: 14px 0; border-radius: 4px;
+  }
+  .callout.risk { background: #fdecea; border-color: var(--danger); }
+  .callout.ok   { background: #e6f7ef; border-color: var(--pos); }
+  .callout.diff { background: #eaf2fb; border-color: var(--accent); }
+
+  code { font-family: "JetBrains Mono", Menlo, Consolas, monospace; font-size: 13px;
+    background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+    font-family: "JetBrains Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+    line-height: 1.4;
+  }
+  pre.ascii { line-height: 1.2; }
+
+  details { background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 14px; margin: 10px 0; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--accent); padding: 4px 0; }
+  details[open] summary { margin-bottom: 8px; }
+
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px;
+    background: var(--thead-bg); color: var(--fg-soft); font-size: 12px;
+    margin: 0 4px 0 0; }
+  .pill.ok { background: #e6f7ef; color: var(--pos); }
+  .pill.warn { background: #fff3e0; color: var(--warn); }
+  .pill.danger { background: #fdecea; color: var(--danger); }
+  .pill.new { background: var(--accent); color: white; font-weight: 600; }
+
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  @media (max-width: 900px) {
+    body { grid-template-columns: 1fr; }
+    nav.sidebar { display: none; }
+    main { padding: 24px 20px 72px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <h1>Pitch · Gacha <span class="badge">v2</span></h1>
+  <a href="#summary" class="active">1. Executive summary</a>
+  <a href="#model">2. Model in one paragraph</a>
+  <a href="#inventory">3. Inventory pool</a>
+  <a href="#mechanics">4. Mechanics</a>
+  <a href="#presale" class="highlight">5. Pre-sale design <span class="pill new">NEW</span></a>
+  <a href="#economics">6. Headline economics</a>
+  <a href="#ux">7. User experience</a>
+  <a href="#industry">8. Industry benchmarks</a>
+  <a href="#sensitivity">9. Sensitivity findings</a>
+  <a href="#shortfall">10. Demand shortfall</a>
+  <a href="#low-volume">11. Low-volume risk</a>
+  <a href="#shock">12. Floor-shock stress test</a>
+  <a href="#risks">13. Risks</a>
+  <a href="#recommendation">14. Recommendation</a>
+  <a href="#next">15. Next steps</a>
+  <div class="grp">Appendices</div>
+  <a href="#appendix-a">A. Assumptions</a>
+  <a href="#appendix-b">B. Reproduction</a>
+  <a href="#appendix-c">C. v1 → v2 deltas</a>
+  <a href="#appendix-d">D. Full config & parameters</a>
+</nav>
+
+<main>
+<header>
+  <h1>Rarible Multi-Collection NFT Gacha <span class="v-tag">v2 · pre-sale design</span></h1>
+  <div class="meta">Internal Approval Memo · Updated 2026-05-28 · Monte Carlo simulation (1,000 paths × 1,000 pulls/campaign) · Inventory snapshot 2026-05-25 · Auto-buyback discount 8% (user gets 92% of floor) · <em>v1 ($960 flat) archived in <code>archive/pitch_v1_flat960.html</code></em></div>
+</header>
+
+<!-- ============================================================ -->
+<section id="summary" class="hero">
+  <h2>1. Executive summary</h2>
+  <p>A <strong>capital-light, inventory-lent</strong> NFT gacha. Rarible plays two roles — operator and small co-lender — and walks away with <strong>~562% ROI on $25k of working capital</strong> per weekly campaign in expectation. The v2 design adds a <strong>price-discriminated pre-sale</strong> (first 200 boxes at $900, remainder at $990) backed by a <strong>refund-guarantee gate</strong> that eliminates the cold-start tail risk identified in v1. Auto-buyback discount is 8% — users get 92% of NFT floor on instant-sell.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Capital at risk</div><div class="value">$25,000</div><div class="sub">Rarible's working-capital buffer</div></div>
+    <div class="kpi pos"><div class="label">Expected return</div><div class="value">$165,600</div><div class="sub">capital + profit, at full volume</div></div>
+    <div class="kpi pos"><div class="label">Operator ROI</div><div class="value">562%</div><div class="sub">p5 395% · p95 715%</div></div>
+    <div class="kpi"><div class="label">Cap-loss probability</div><div class="value">0%</div><div class="sub">at full 1,000 pulls (gated by refund)</div></div>
+    <div class="kpi"><div class="label">Lender recovery</div><div class="value">213%</div><div class="sub">2.1× principal for partners</div></div>
+    <div class="kpi"><div class="label">Max user ROI / box</div><div class="value">+1,032%</div><div class="sub">11.3× on a pre-sale Pudgy hit</div></div>
+  </div>
+
+  <div class="callout diff">
+    <strong>v2 vs v1 at a glance</strong>: regular box price hiked $960 → $990 (12.1% edge), pre-sale at $900 for first 200 boxes (3.3% edge), auto-buyback discount tightened 6% → 8%. Net +$15.6k gross revenue per full campaign, +42 pp operator ROI, +8.5 pp lender pool recovery, +$71 max-ROI premium for pre-sale users. Full v1 → v2 delta sheet in <a href="#appendix-c">Appendix C</a>.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="model">
+  <h2>2. The model in one paragraph</h2>
+  <p>11 partner collections lend <strong>$74,288 of NFTs</strong> as inventory. Rarible adds <strong>$25,000 cash</strong> as a working-capital buffer. A <strong>pre-sale phase</strong> sells the first 200 boxes at $900 each, refundable if the 200-box threshold isn't met; the rest of the campaign sells at $990. Each box resolves to one of four outcomes (headline / high / mid / low NFT, or "1 shard"). After each NFT pull, the gacha offers to buy the NFT back instantly at <strong>92% of its floor price</strong> — most users accept (~62% blended acceptance). When inventory drops below 50% (or the headline tier empties), the operator buys missing NFTs back from the open market, paid from the cashbox. End of the weekly campaign: debt is repaid to lenders first, then Rarible takes its capital back, then the remaining profit is split (62.6% Rarible / 37.4% external lenders).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="inventory">
+  <h2>3. Inventory pool</h2>
+  <p>Eleven partner collections contribute <strong>77 NFTs worth $74,288</strong> total principal. Locked floor prices from Rarible BFF (2026-05-25 snapshot).</p>
+  <table>
+    <thead>
+      <tr><th>Collection</th><th>Tier</th><th class="num">Floor</th><th class="num">Count lent</th><th class="num">Lent value</th><th class="num">Share</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Pudgy Penguins (headline)</strong></td><td>headline</td><td class="num">$10,191</td><td class="num">2</td><td class="num">$20,382</td><td class="num">27.4%</td></tr>
+      <tr><td>Azuki</td><td>high</td><td class="num">$1,786</td><td class="num">4</td><td class="num">$7,144</td><td class="num">9.6%</td></tr>
+      <tr><td>MAYC (BAYC ecosystem)</td><td>high</td><td class="num">$2,106</td><td class="num">3</td><td class="num">$6,318</td><td class="num">8.5%</td></tr>
+      <tr><td>Quirkies</td><td>high</td><td class="num">$2,338</td><td class="num">2</td><td class="num">$4,676</td><td class="num">6.3%</td></tr>
+      <tr><td>Moonbirds</td><td>high</td><td class="num">$2,043</td><td class="num">2</td><td class="num">$4,086</td><td class="num">5.5%</td></tr>
+      <tr><td>Lil Pudgys (Pudgy eco)</td><td>mid</td><td class="num">$1,236</td><td class="num">5</td><td class="num">$6,180</td><td class="num">8.3%</td></tr>
+      <tr><td>Good Vibes Club</td><td>mid</td><td class="num">$1,453</td><td class="num">4</td><td class="num">$5,812</td><td class="num">7.8%</td></tr>
+      <tr><td>Doodles</td><td>mid</td><td class="num">$1,158</td><td class="num">5</td><td class="num">$5,790</td><td class="num">7.8%</td></tr>
+      <tr><td>Rektguy</td><td>mid</td><td class="num">$562</td><td class="num">10</td><td class="num">$5,620</td><td class="num">7.6%</td></tr>
+      <tr><td>Sappy Seals</td><td>low</td><td class="num">$290</td><td class="num">20</td><td class="num">$5,800</td><td class="num">7.8%</td></tr>
+      <tr><td>Normies</td><td>low</td><td class="num">$124</td><td class="num">20</td><td class="num">$2,480</td><td class="num">3.3%</td></tr>
+      <tr><td><strong>TOTAL</strong></td><td></td><td></td><td class="num"><strong>77</strong></td><td class="num"><strong>$74,288</strong></td><td class="num"><strong>100%</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Unchanged from v1. Inventory composition is independent of box pricing.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="mechanics">
+  <h2>4. Mechanics</h2>
+
+  <h3>4a. Pull flow per box</h3>
+<pre class="ascii">
+                          BOX
+                ($900 first 200 / $990 after)
+                              |
+              +---------------+----------+---------+----------+
+              |               |          |         |          |
+           1% Pudgy        15% High    32% Mid   32% Low   20% Shard
+        ($10,191)      ($1,786-2,338) ($562-1,453) ($124-290) (1/5 of regular box)
+              |               |          |         |
+              v               v          v         v
+        Auto-buyback offer at 94% of floor
+              |               |          |         |
+        accept 5%       accept 25%   accept 60%  accept 85%
+              |               |          |         |
+        keep NFT  or  take cash;  NFT returns to pool on accept
+</pre>
+
+  <h3>4b. Reward odds — what you actually pull, and at what probability</h3>
+  <p>Within each tier the simulator samples uniformly across remaining inventory; an individual NFT's probability = (tier probability) × (count of that NFT in tier) / (total NFTs in tier). Floor values are locked at the snapshot (2026-05-25). Auto-buyback rate is 92% of floor (8% spread retained by operator).</p>
+  <table>
+    <thead>
+      <tr><th>Outcome</th><th class="num">P(per box)</th><th class="num">NFTs in pool</th><th class="num">Floor</th><th class="num">Buyback offer (92%)</th><th class="num">User keeps</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="6" style="background:var(--thead-bg); font-weight:600;">HEADLINE tier — 1.0% total</td></tr>
+      <tr><td>Pudgy Penguins</td><td class="num">0.50% each</td><td class="num">2</td><td class="num">$10,191</td><td class="num">$9,376</td><td class="num"><span class="pill ok">95%</span></td></tr>
+
+      <tr><td colspan="6" style="background:var(--thead-bg); font-weight:600;">HIGH tier — 15.0% total</td></tr>
+      <tr><td>Azuki</td><td class="num">5.45%</td><td class="num">4</td><td class="num">$1,786</td><td class="num">$1,643</td><td class="num">75%</td></tr>
+      <tr><td>MAYC (BAYC ecosystem)</td><td class="num">4.09%</td><td class="num">3</td><td class="num">$2,106</td><td class="num">$1,938</td><td class="num">75%</td></tr>
+      <tr><td>Quirkies</td><td class="num">2.73%</td><td class="num">2</td><td class="num">$2,338</td><td class="num">$2,151</td><td class="num">75%</td></tr>
+      <tr><td>Moonbirds</td><td class="num">2.73%</td><td class="num">2</td><td class="num">$2,043</td><td class="num">$1,880</td><td class="num">75%</td></tr>
+
+      <tr><td colspan="6" style="background:var(--thead-bg); font-weight:600;">MID tier — 32.0% total</td></tr>
+      <tr><td>Lil Pudgys (Pudgy eco)</td><td class="num">6.67%</td><td class="num">5</td><td class="num">$1,236</td><td class="num">$1,137</td><td class="num">40%</td></tr>
+      <tr><td>Good Vibes Club</td><td class="num">5.33%</td><td class="num">4</td><td class="num">$1,453</td><td class="num">$1,337</td><td class="num">40%</td></tr>
+      <tr><td>Doodles</td><td class="num">6.67%</td><td class="num">5</td><td class="num">$1,158</td><td class="num">$1,065</td><td class="num">40%</td></tr>
+      <tr><td>Rektguy</td><td class="num">13.33%</td><td class="num">10</td><td class="num">$562</td><td class="num">$517</td><td class="num">40%</td></tr>
+
+      <tr><td colspan="6" style="background:var(--thead-bg); font-weight:600;">LOW tier — 32.0% total</td></tr>
+      <tr><td>Sappy Seals</td><td class="num">16.00%</td><td class="num">20</td><td class="num">$290</td><td class="num">$267</td><td class="num"><span class="pill warn">15%</span></td></tr>
+      <tr><td>Normies</td><td class="num">16.00%</td><td class="num">20</td><td class="num">$124</td><td class="num">$114</td><td class="num"><span class="pill warn">15%</span></td></tr>
+
+      <tr><td colspan="6" style="background:var(--thead-bg); font-weight:600;">CONSOLATION — 20.0% total (non-NFT)</td></tr>
+      <tr><td>1 shard (= 1/5 of a regular box)</td><td class="num">20.00%</td><td class="num">—</td><td class="num">$198 perceived</td><td class="num">N/A (no buyback)</td><td class="num">100%</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Reading the table</strong>: a single $990 box has a 0.5% chance of pulling each specific Pudgy Penguin (10.6× max return if kept), a 5.45% chance of an Azuki, a 16% chance of a Sappy Seal, etc. "User keeps" = 1 − P(accept auto-buyback). Floor pulls (Sappy / Normies) are dumped back 85% of the time; headline pulls (Pudgy) are kept 95% of the time. Within-tier sampling is uniform so individual-NFT probability scales with how many of that NFT the partner contributed.</p>
+
+  <h3>4c. Auto-buyback flywheel</h3>
+  <ul>
+    <li>User pulls → operator offers buyback at 92% of floor</li>
+    <li><strong>If accepted</strong>: NFT returns to pool, operator pays the 92% out of cashbox, pockets the 8% spread</li>
+    <li><strong>If kept</strong>: NFT permanently leaves the pool; lender is owed its value at settlement</li>
+    <li>~63% blended acceptance means most pulls cycle through the pool multiple times</li>
+  </ul>
+
+  <h3>4d. Restock</h3>
+  <ul>
+    <li>Triggered when total inventory < 50% (38 NFTs) <em>OR</em> when the headline tier is empty</li>
+    <li>Operator buys missing NFTs from open market at floor, paid from cashbox</li>
+    <li>Reduces lender debt accordingly</li>
+    <li>Expected: ~8 restocks per 1,000-pull campaign</li>
+  </ul>
+
+  <h3>4e. End-of-campaign settlement (waterfall)</h3>
+<pre class="ascii">
+1. CASHBOX (at end of campaign)
+       = (Sum 200 × $900 pre-sale boxes) + (Sum N × $990 regular boxes)
+         - Sum auto-buyback payouts
+         - Sum restock costs
+         - Sum consolation costs
+
+2. SENIOR LENDER DEBT REPAID
+       = min(cashbox, remaining lender debt)
+       Lenders made whole on NFTs that left the pool
+       and weren't restocked.
+
+3. OPERATOR CAPITAL RETURNED
+       = min(cashbox-post-debt, $25,000)
+
+4. PROFIT = remaining cashbox
+       +--------------------------------------------------------------+
+       |  OPERATOR FEE             = 50% × profit     -> Rarible      |
+       |  POST-FEE PROFIT  = 50% × profit                            |
+       |     pro-rata to capital:                                     |
+       |       25.18% -> Rarible (as lender)                          |
+       |       74.82% -> External NFT lenders                         |
+       +--------------------------------------------------------------+
+
+   Rarible total share   = 50% + 50% × 25.18% = 62.6% of profit
+   External lender total = 50% × 74.82%        = 37.4% of profit
+</pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="presale">
+  <h2>5. Pre-sale design <span class="pill new">NEW IN v2</span></h2>
+  <p>v2 introduces a two-tier price structure plus a refund-guarantee gate that eliminates the cold-start risk identified in v1.</p>
+
+  <h3>5a. The problem being solved</h3>
+  <p>v1 (flat $960 per box) showed a structural failure mode at low volumes:</p>
+  <ul>
+    <li>22% chance of operator capital loss if the campaign only sells 25 boxes</li>
+    <li>15% chance at 50 boxes</li>
+    <li>8% chance at 100 boxes</li>
+  </ul>
+  <p>The cause is structural: at low volumes, the cashbox hasn't accumulated enough revenue to absorb a single early Pudgy hold ($10,191 in instant debt against ~$25k buffer + thin box revenue). The flywheel doesn't engage. <strong>Raising the buffer doesn't fix this</strong> (the cap-loss probability is volume-dependent, not capital-dependent) — we tested this in v1 and the matrix was flat across buffer sizes.</p>
+
+  <h3>5b. The v2 design</h3>
+  <table>
+    <thead><tr><th>Phase</th><th class="num">Boxes</th><th class="num">Price</th><th class="num">Implied edge</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pre-sale</strong></td><td class="num">First 200</td><td class="num">$900</td><td class="num">3.3%</td><td>Secure committed demand at a small discount to derisk the cold start</td></tr>
+      <tr><td><strong>Regular</strong></td><td class="num">Up to 800 more</td><td class="num">$990</td><td class="num">12.1%</td><td>Margin where the bulk of operator profit accrues</td></tr>
+      <tr><td><strong>Blended</strong></td><td class="num">1,000 target</td><td class="num">$972 avg</td><td class="num">~10.6%</td><td>Net effect: slightly better than v1's $960 flat</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5c. The refund-guarantee gate</h3>
+  <div class="callout ok">
+    <strong>If fewer than 200 paid pre-orders land by the deadline, every pre-sale buyer is refunded automatically and the campaign does not open.</strong>
+    Operator cost on miss: $0. The buffer stays unspent and gets redeployed next cycle. The campaign only goes live when the demand floor is provably above the cold-start risk zone.
+  </div>
+
+  <h3>5d. Why this works (and why a price hike alone wouldn't)</h3>
+  <p>Pre-sale by itself <em>increases</em> low-volume risk (less revenue per box means slower cashbox accumulation):</p>
+  <table>
+    <thead>
+      <tr><th class="num">Pulls completed</th><th class="num">v1 cap-loss</th><th class="num">v2 cap-loss</th><th class="num">Δ</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">25</td><td class="num">22.3%</td><td class="num">27.2%</td><td class="num">+4.9 pp</td></tr>
+      <tr><td class="num">50</td><td class="num">14.8%</td><td class="num">24.6%</td><td class="num">+9.8 pp</td></tr>
+      <tr><td class="num">100</td><td class="num">7.8%</td><td class="num">16.8%</td><td class="num">+9.0 pp</td></tr>
+      <tr><td class="num">200</td><td class="num">1.9%</td><td class="num">7.1%</td><td class="num">+5.2 pp</td></tr>
+      <tr><td class="num">1000</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+  <p>The <strong>refund guarantee</strong> is what converts this from a risk profile into a binary outcome:</p>
+  <ul>
+    <li><strong>Pre-sale hits 200</strong> → campaign opens → expected 1,000-pull run → 0% cap-loss, 549% ROI</li>
+    <li><strong>Pre-sale misses 200</strong> → automatic refund → 0% cap-loss, 0% ROI, capital redeployed</li>
+  </ul>
+  <p>Without the gate, v2 would be strictly worse than v1 at low volumes. With the gate, v2 is strictly better at full volume and equivalent (= cancelled) when conditions aren't met.</p>
+
+  <h3>5e. Side benefits to users</h3>
+  <ul>
+    <li><strong>Pre-sale boxes offer a $71 better max-ROI</strong> ($10,191 Pudgy / $900 = +1,032% vs $10,191 / $990 = +929%). Marketing angle: "best deal of the campaign goes to early supporters."</li>
+    <li><strong>Refund-guarantee removes user-side risk</strong> — pre-sale users only pay if the campaign actually runs. Lowers psychological barrier to early commitment.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="economics">
+  <h2>6. Headline economics</h2>
+
+  <h3>6a. Per-campaign cashflows (mean / p5 / p95 over 1,000 paths)</h3>
+  <table>
+    <thead><tr><th>Item</th><th class="num">Mean</th><th class="num">p5</th><th class="num">p95</th></tr></thead>
+    <tbody>
+      <tr><td>Gross box revenue</td><td class="num">$972,000</td><td class="num">—</td><td class="num">—</td></tr>
+      <tr><td>Cashbox at end</td><td class="num">$275,033</td><td class="num">$205,831</td><td class="num">$341,774</td></tr>
+      <tr><td>Lender debt (consumed-NFT $)</td><td class="num">~$25,400</td><td class="num">~$1,200</td><td class="num">~$49,800</td></tr>
+      <tr><td>Profit (post-debt, post-capital)</td><td class="num">$224,619</td><td class="num">$157,920</td><td class="num">$285,395</td></tr>
+      <tr><td><strong>Rarible take (62.6%)</strong></td><td class="num"><strong>$140,588</strong></td><td class="num">$98,841</td><td class="num">$178,628</td></tr>
+      <tr><td>External lender pool cash</td><td class="num">$109,445</td><td class="num">$74,047</td><td class="num">$143,806</td></tr>
+      <tr><td>Restock spend</td><td class="num">~$387,700</td><td class="num">—</td><td class="num">—</td></tr>
+      <tr><td>Consolation / shard liability</td><td class="num">$39,638</td><td class="num">—</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6b. Rarible's $25k → expected outcomes</h3>
+  <table>
+    <thead><tr><th>Component</th><th class="num">$</th></tr></thead>
+    <tbody>
+      <tr><td>Initial capital</td><td class="num">$25,000</td></tr>
+      <tr><td>Capital returned at settlement</td><td class="num">$25,000</td></tr>
+      <tr><td>Operator fee (50% × profit)</td><td class="num">~$112,300</td></tr>
+      <tr><td>Lender pro-rata share (12.6% × profit)</td><td class="num">~$28,300</td></tr>
+      <tr><td><strong>Total back to Rarible</strong></td><td class="num"><strong>$165,588</strong></td></tr>
+      <tr><td><strong>Net profit</strong></td><td class="num"><strong>$140,588</strong></td></tr>
+      <tr><td><strong>ROI on capital</strong></td><td class="num"><strong>~562%</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>6c. External lender recovery (per partner)</h3>
+  <p>All 10 NFT-contributing partners earn the same recovery ratio under the pro-rata structure. <strong>Recovery ratio: ~213.1%</strong> (up from 204.6% in v1) — every partner walks away with ≈2.13× their principal contribution per week.</p>
+  <table>
+    <thead><tr><th>Partner</th><th class="num">Lent</th><th class="num">v2 mean recovery</th></tr></thead>
+    <tbody>
+      <tr><td>Pudgy Penguins (headline)</td><td class="num">$20,382</td><td class="num">~$43,430</td></tr>
+      <tr><td>Azuki</td><td class="num">$7,144</td><td class="num">~$15,226</td></tr>
+      <tr><td>MAYC</td><td class="num">$6,318</td><td class="num">~$13,463</td></tr>
+      <tr><td>Quirkies</td><td class="num">$4,676</td><td class="num">~$9,964</td></tr>
+      <tr><td>Moonbirds</td><td class="num">$4,086</td><td class="num">~$8,707</td></tr>
+      <tr><td>Lil Pudgys</td><td class="num">$6,180</td><td class="num">~$13,170</td></tr>
+      <tr><td>Good Vibes Club</td><td class="num">$5,812</td><td class="num">~$12,386</td></tr>
+      <tr><td>Doodles</td><td class="num">$5,790</td><td class="num">~$12,339</td></tr>
+      <tr><td>Rektguy</td><td class="num">$5,620</td><td class="num">~$11,977</td></tr>
+      <tr><td>Sappy Seals</td><td class="num">$5,800</td><td class="num">~$12,361</td></tr>
+      <tr><td>Normies</td><td class="num">$2,480</td><td class="num">~$5,285</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="ux">
+  <h2>7. User experience</h2>
+  <ul>
+    <li><strong>Max ROI per pre-sale box: +1,032% (11.3×)</strong> on a Pudgy hit. Pre-sale users get the campaign's best max payout.</li>
+    <li><strong>Max ROI per regular box: +929% (10.3×)</strong> on a Pudgy hit. Still a major prize.</li>
+    <li><strong>Worst outcome: 1 shard</strong> (worth 1/5 of a future regular box = $198 perceived value). Every pull delivers something the user can keep or sell.</li>
+    <li><strong>Mid-tier "consolation prize" feel</strong>: ~52% of pulls produce a mid- or low-tier NFT, where the auto-buyback offer at 92% of floor typically becomes the better choice.</li>
+    <li><strong>Per-pull expected value: ~$870</strong>; on the regular $990 box → ~12% implied edge. Beezie / Courtyard run wider edges (12-15%).</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="industry">
+  <h2>8. Industry benchmarks</h2>
+  <table>
+    <thead><tr><th>Platform</th><th class="num">Blended auto-buyback acceptance</th><th class="num">Discount on instant-sell</th></tr></thead>
+    <tbody>
+      <tr><td>Courtyard</td><td class="num">~60-75%</td><td class="num">10-15%</td></tr>
+      <tr><td>Beezie</td><td class="num">~65-85%</td><td class="num">10-20%</td></tr>
+      <tr><td><strong>Rarible (this design)</strong></td><td class="num"><strong>~62%</strong></td><td class="num"><strong>8%</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Rarible's design remains <strong>friendlier to users on the haircut (8% vs ~12%)</strong> while preserving an industry-comparable acceptance rate.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="sensitivity">
+  <h2>9. Sensitivity findings</h2>
+  <p>Findings from the v1 7-lever sweep remain directionally valid for v2 (the levers tested don't interact with the pre-sale pricing structure):</p>
+  <table>
+    <thead><tr><th>Lever</th><th>Direction of risk</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td><code>p_tier_headline</code></td><td>Above 2% → <span class="pill danger">cap-loss paths appear</span></td><td>Hold at 1%</td></tr>
+      <tr><td><code>restock_threshold</code></td><td>Higher = more restock churn = worse ROI</td><td>25-50% (current 50% OK)</td></tr>
+      <tr><td><code>buyback_acceptance_scale</code></td><td>Higher = better for all parties</td><td>Invest in UX nudges</td></tr>
+      <tr><td><code>initial_cashbox_usd</code></td><td>Trade-off: ROI% ↓ but absolute $ ↑</td><td>$25k is the sweet spot</td></tr>
+      <tr><td><code>p_consolation</code></td><td>Above 30% → ROI tanks (shard liability)</td><td>10-20% range OK</td></tr>
+      <tr><td><code>auto_buyback_discount</code></td><td>Modest lever (+10 pp ROI per 2× widening)</td><td>Hold at 6% for UX</td></tr>
+      <tr><td><code>shard_redemption_rate</code></td><td>Low redemption = better op ROI</td><td>Assume 100% for safety</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="shortfall">
+  <h2>10. Demand shortfall</h2>
+  <p>What happens if the campaign settles before reaching the 1,000-pull target? Settlement snapshot at each 200-pull checkpoint:</p>
+  <table>
+    <thead>
+      <tr><th class="num">Pulls completed</th><th class="num">Op ROI</th><th class="num">Op take $</th><th class="num">Lender cash $</th><th class="num">Cap-loss path rate</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">200</td><td class="num">70.1%</td><td class="num">$18,063</td><td class="num">$35,463</td><td class="num"><span class="pill warn">6.2%</span></td></tr>
+      <tr><td class="num">400</td><td class="num">~170%</td><td class="num">~$42,000</td><td class="num">~$51,000</td><td class="num"><span class="pill ok">~0.3%</span></td></tr>
+      <tr><td class="num">600</td><td class="num">~275%</td><td class="num">~$69,000</td><td class="num">~$71,000</td><td class="num"><span class="pill ok">0%</span></td></tr>
+      <tr><td class="num">800</td><td class="num">~400%</td><td class="num">~$99,000</td><td class="num">~$87,000</td><td class="num"><span class="pill ok">0%</span></td></tr>
+      <tr><td class="num">1000</td><td class="num"><strong>562%</strong></td><td class="num"><strong>$140,409</strong></td><td class="num"><strong>$109,445</strong></td><td class="num">0%</td></tr>
+    </tbody>
+  </table>
+  <p>The campaign reaches the "scaling zone" (0% cap-loss) once the regular-price phase is well underway (~400+ pulls). The pre-sale period itself (boxes 1–200) is the volatile window — see §11.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="low-volume">
+  <h2>11. Low-volume risk</h2>
+  <p>Same analytical framework as v1, re-run at v2 prices. Each row = independent Monte Carlo with campaign hard-capped at that volume (2,000 paths/row).</p>
+
+  <h3>11a. Operator returns by volume (v2)</h3>
+  <table>
+    <thead>
+      <tr><th class="num">Pulls</th><th class="num">Op take mean</th><th class="num">p5</th><th class="num">p95</th><th class="num">ROI mean</th><th class="num">ROI p5</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num"><strong>25</strong></td><td class="num">$2,512</td><td class="num">$0</td><td class="num">$6,336</td><td class="num">4.2%</td><td class="num"><span class="pill danger">−33.9%</span></td></tr>
+      <tr><td class="num"><strong>50</strong></td><td class="num">$4,131</td><td class="num">$0</td><td class="num">$10,052</td><td class="num">10.8%</td><td class="num"><span class="pill danger">−37.7%</span></td></tr>
+      <tr><td class="num"><strong>100</strong></td><td class="num">$8,315</td><td class="num">$0</td><td class="num">$17,279</td><td class="num">28.8%</td><td class="num"><span class="pill danger">−36.5%</span></td></tr>
+      <tr><td class="num">200</td><td class="num">$18,063</td><td class="num">$0</td><td class="num">$33,994</td><td class="num">70.1%</td><td class="num"><span class="pill warn">−7.6%</span></td></tr>
+      <tr><td class="num">500</td><td class="num">$63,778</td><td class="num">$34,384</td><td class="num">$90,104</td><td class="num">255%</td><td class="num"><span class="pill ok">+137.5%</span></td></tr>
+      <tr><td class="num">1000</td><td class="num">$140,409</td><td class="num">$98,649</td><td class="num">$179,345</td><td class="num"><strong>562%</strong></td><td class="num"><span class="pill ok">+394.6%</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>11b. Risk metrics</h3>
+  <table>
+    <thead>
+      <tr><th class="num">Pulls</th><th class="num">P(cap-loss)</th><th class="num">Mean loss when occurs</th><th class="num">P(ROI&lt;0)</th><th class="num">P(ROI&lt;50%)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num"><strong>25</strong></td><td class="num"><span class="pill danger">26.6%</span></td><td class="num">$5,531</td><td class="num">26.6%</td><td class="num">100%</td></tr>
+      <tr><td class="num"><strong>50</strong></td><td class="num"><span class="pill danger">23.4%</span></td><td class="num">$6,128</td><td class="num">23.4%</td><td class="num">99.2%</td></tr>
+      <tr><td class="num"><strong>100</strong></td><td class="num"><span class="pill danger">15.4%</span></td><td class="num">$7,212</td><td class="num">15.4%</td><td class="num">72.7%</td></tr>
+      <tr><td class="num">200</td><td class="num"><span class="pill warn">6.2%</span></td><td class="num">$8,618</td><td class="num">6.2%</td><td class="num">29.7%</td></tr>
+      <tr><td class="num">500</td><td class="num"><span class="pill ok">0.1%</span></td><td class="num">$11,580</td><td class="num">0.1%</td><td class="num">0.4%</td></tr>
+      <tr><td class="num">1000</td><td class="num"><span class="pill ok">0%</span></td><td class="num">—</td><td class="num">0%</td><td class="num">0%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout risk">
+    <strong>v2 low-volume risk is HIGHER than v1.</strong> Pre-sale boxes ($900) bring in less revenue than v1 flat ($960), so the cashbox absorbs less of the early Pudgy-hold tail. The pre-sale window <em>amplifies</em> the cold-start risk on a per-box basis. <strong>This is exactly why the refund-guarantee gate is mandatory</strong> — it converts this risky window into a binary "open at 200+ pre-orders" condition, never running the campaign in the dangerous regime.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="shock">
+  <h2>12. Floor-shock stress test</h2>
+  <p>Pudgy floor moves at pull 500. Re-run at v2 prices (1,000 paths each).</p>
+  <table>
+    <thead>
+      <tr><th>Scenario</th><th class="num">Op ROI</th><th class="num">Δ vs v2 baseline</th><th class="num">Pudgy team recovery</th><th class="num">Other lenders</th><th class="num">Cap-loss paths</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Baseline (no shock)</td><td class="num"><strong>562.4%</strong></td><td class="num">—</td><td class="num">213.1%</td><td class="num">213.1%</td><td class="num">0%</td></tr>
+      <tr><td>Pudgy <strong>+50%</strong></td><td class="num">489.9%</td><td class="num">−73 pp</td><td class="num"><span class="pill ok">~250%</span></td><td class="num">~195%</td><td class="num"><span class="pill ok">0.1%</span></td></tr>
+      <tr><td>Pudgy <strong>+100%</strong></td><td class="num">417.3%</td><td class="num">−145 pp</td><td class="num">~285%</td><td class="num">~180%</td><td class="num"><span class="pill warn">0.3%</span></td></tr>
+      <tr><td>Pudgy <strong>−50%</strong></td><td class="num"><strong>634.8%</strong></td><td class="num">+72 pp</td><td class="num"><span class="pill danger">~177%</span></td><td class="num">~228%</td><td class="num">0%</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Asymmetric pain on lenders</strong>: Pudgy team WINS on a floor up-move (their remaining NFTs appreciate) and LOSES on a crash (consumed-NFT debt repaid at lower floors, remaining inventory worth less). Other lenders move the opposite direction via the pro-rata profit split. <strong>Real tail risk only at extreme moves (+100% shock)</strong>: 0.5% cap-loss probability appears — mitigation is bumping the buffer or constraining the Pudgy pool size, not a v2 concern at expected volatility.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="risks">
+  <h2>13. Risks</h2>
+  <ol>
+    <li><strong>NFT floor volatility</strong> — A sudden +50% floor jump on a heavily-consumed collection inflates momentary debt and restock cost by ~50%. <em>Mitigation:</em> bigger cashbox buffer, or per-campaign floor re-pricing trigger above a threshold move. (Quantified in §12.)</li>
+    <li><strong>Open-market liquidity for restock</strong> — ~$388k of NFT purchases per campaign. Concentrated on Pudgies, Lil Pudgys, Doodles, Rektguy. <em>Mitigation:</em> split restocks into multiple smaller buys, or use Reservoir aggregator for slippage management.</li>
+    <li><strong>Cold-start demand risk</strong> — Below 200 pulls the model becomes structurally risky (see §11): 27%/23%/15% cap-loss probability at 25/50/100 pulls. <em>Mitigation in v2:</em> the refund-guarantee gate ensures the campaign only opens above 200 paid commits. <strong>Without the gate, v2 is strictly worse than v1 at low volumes.</strong></li>
+    <li><strong>Pre-sale gate operational risk</strong> — The refund mechanism must execute reliably. If pre-sale undersells AND Rarible runs the campaign anyway (override), cap-loss probability spikes. <em>Mitigation:</em> automated refund triggered by smart-contract or off-chain deadline; no manual override.</li>
+    <li><strong>Pudgy floor dependence</strong> — Pudgy Penguins is 27% of pool value AND the sole headline tier. If Pudgy floor crashes mid-campaign, Pudgy team's recovery drops. <em>Mitigation:</em> side-letter on settlement valuation.</li>
+    <li><strong>Partnership concentration</strong> — All 11 partners must agree on the same waterfall terms. If one drops late, tier mix changes and box pricing needs recomputation.</li>
+    <li><strong>Regulatory / lootbox classification</strong> — Not addressed here. Legal needs to confirm the auto-buyback mechanic + pre-sale + refund don't reclassify the product under gambling regulations.</li>
+  </ol>
+</section>
+
+<!-- ============================================================ -->
+<section id="recommendation">
+  <h2>14. Recommendation</h2>
+  <div class="callout ok">
+    <strong>Approve $25,000 of Rarible treasury capital</strong> for a one-week pilot using the v2 <code>industry_calibrated</code> configuration, <strong>conditional on the refund-guarantee gate being implemented and enforced</strong>. Expected outcomes at full volume (1,000 pulls): Rarible profit $140,588 (562% ROI), 11 partners recover 2.13× their lent value, capital-loss probability 0%.
+  </div>
+  <div class="callout risk">
+    <strong>The refund-guarantee gate is non-negotiable for v2.</strong> If the gate is dropped and the campaign runs at sub-200 volume, expected cap-loss probability is 6-27% with mean losses $5,500-$8,600 per affected path. The +$11k operator-take uplift over v1 only materializes when the full 1,000 pulls happen.
+  </div>
+  <p>Pilot-week unlocks the data we need to verify the two most uncertain assumptions: real user acceptance rate (modeled at 63%) and effective shard redemption rate (modeled at 100%, likely 30–60% in practice).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="next">
+  <h2>15. Next steps</h2>
+  <ol>
+    <li><strong>Partnership commitments</strong>: confirm written intent from each of the 11 collections under the v2 waterfall terms outlined in §4d.</li>
+    <li><strong>Refund-guarantee infrastructure</strong>: design the on-chain or escrow mechanism that automates pre-sale refunds if the 200-box threshold isn't met. Critical — see §13 risk #4.</li>
+    <li><strong>Settlement infrastructure</strong>: design and deploy the multi-sig / on-chain settlement contract that automates the waterfall.</li>
+    <li><strong>UX prototype</strong>: build the pull → auto-buyback flow with default-to-instant-sell behaviour. Highlight the pre-sale max-ROI (+1,032%) in marketing copy.</li>
+    <li><strong>Legal review</strong>: confirm regulatory classification, including the pre-sale + refund mechanism.</li>
+    <li><strong>Stress tests</strong>: re-run floor-shock and demand-shortfall scenarios at finalised pricing before live launch.</li>
+    <li><strong>Pilot</strong>: launch with full instrumentation, then re-calibrate model parameters from observed user behaviour.</li>
+  </ol>
+</section>
+
+<hr class="sep" />
+
+<!-- ============================================================ -->
+<section id="appendix-a">
+  <h2>Appendix A — Model assumptions</h2>
+  <p>See <code>simulation_assumptions.py</code> for the full declarative list. Highlights:</p>
+  <ul>
+    <li>Floor prices held constant within the campaign (except in §12 stress tests)</li>
+    <li>Demand deterministic at 1,000 pulls (no stochastic demand modeling yet)</li>
+    <li>User acceptance Bernoulli, independent across pulls</li>
+    <li>No gas fees / opex / CAC costs modeled</li>
+    <li>Inventory restock is instantaneous at floor (no slippage)</li>
+    <li>Single-campaign analysis only (no multi-week carryover)</li>
+    <li>Refund-guarantee mechanism modeled as a hard binary gate (run or don't), not as a continuous probabilistic process</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="appendix-b">
+  <h2>Appendix B — How to reproduce these numbers</h2>
+<pre>
+cd proposal2-lootbox-monte-carlo/multi-collection
+python3 inventory_static.py         # inventory snapshot
+python3 gacha_config.py             # per-pull EV math
+python3 simulator.py                # full Monte Carlo + shock scenarios
+python3 low_volume.py               # low-volume risk sweep (25/50/100/200/500/1000)
+python3 sensitivity.py              # 7-lever sweeps
+python3 simulation_assumptions.py   # full declarative model dump
+</pre>
+  <p>v2 config in <code>gacha_config.py</code>:</p>
+<pre>
+"industry_calibrated": GachaConfig(
+    box_price_usd=990.0,             # regular boxes
+    presale_pulls=200,               # first 200 are pre-sale
+    presale_box_price_usd=900.0,     # pre-sale rate
+    ...
+)
+</pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="appendix-c">
+  <h2>Appendix C — v1 → v2 delta sheet</h2>
+  <table>
+    <thead><tr><th>Item</th><th>v1 ($960 flat)</th><th>v2 ($900×200 + $990×800)</th><th class="num">Δ</th></tr></thead>
+    <tbody>
+      <tr><td>Regular box price</td><td>$960</td><td>$990</td><td class="num">+$30</td></tr>
+      <tr><td>Pre-sale price</td><td>n/a</td><td>$900</td><td class="num">—</td></tr>
+      <tr><td>Pre-sale box count</td><td>0</td><td>200</td><td class="num">+200</td></tr>
+      <tr><td>Auto-buyback discount</td><td>6%</td><td>8%</td><td class="num">+2 pp</td></tr>
+      <tr><td>Implied edge (regular)</td><td>9.4%</td><td>12.1%</td><td class="num">+2.7 pp</td></tr>
+      <tr><td>Implied edge (pre-sale)</td><td>n/a</td><td>3.3%</td><td class="num">—</td></tr>
+      <tr><td>Gross box revenue (1000 pulls)</td><td>$960,000</td><td>$972,000</td><td class="num">+$12,000</td></tr>
+      <tr><td>Op take (1000 pulls)</td><td>$129,992</td><td>$140,588</td><td class="num">+$10,596</td></tr>
+      <tr><td>Op ROI (1000 pulls)</td><td>520%</td><td>562%</td><td class="num">+42 pp</td></tr>
+      <tr><td>Lender pool cash (1000 pulls)</td><td>$103,060</td><td>$109,445</td><td class="num">+$6,385</td></tr>
+      <tr><td>Pool recovery</td><td>204.6%</td><td>213.1%</td><td class="num">+8.5 pp</td></tr>
+      <tr><td>Cap-loss @ 25 pulls</td><td>22.3%</td><td>26.6%</td><td class="num">+4.3 pp (worse)</td></tr>
+      <tr><td>Cap-loss @ 100 pulls</td><td>7.8%</td><td>15.4%</td><td class="num">+7.6 pp (worse)</td></tr>
+      <tr><td>Cap-loss @ 200 pulls</td><td>1.9%</td><td>6.2%</td><td class="num">+4.3 pp (worse)</td></tr>
+      <tr><td>Cap-loss @ 1000 pulls</td><td>0%</td><td>0%</td><td class="num">—</td></tr>
+      <tr><td>Max user ROI (best case)</td><td>+961%</td><td>+1,032% (pre-sale)</td><td class="num">+71 pp</td></tr>
+      <tr><td>Cold-start mitigation</td><td>—</td><td>Refund-guarantee gate</td><td class="num">structural</td></tr>
+    </tbody>
+  </table>
+  <p>The v2 design is <strong>strictly better at full volume</strong> (1,000 pulls) and <strong>strictly worse at low volumes</strong> (25–200 pulls). The refund-guarantee gate is what makes the trade favourable: it converts the worse low-volume risk into a binary "don't run the campaign" outcome.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="appendix-d">
+  <h2>Appendix D — Full configuration &amp; parameter reference</h2>
+  <p>Single canonical source for every parameter that drives the simulation. Anything not in this list is either derived from these values (helpers in <code>gacha_config.py</code>) or assumed away (see Appendix A for the "not modeled" list).</p>
+
+  <h3>D1. Inventory (locked snapshot — <code>inventory_static.py</code>)</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>SNAPSHOT_DATE</code></td><td class="num">2026-05-25</td><td>Date floors were fetched from Rarible BFF</td></tr>
+      <tr><td><code>ETH_USD_RATE</code></td><td class="num">$2,106</td><td>Locked for the whole campaign</td></tr>
+      <tr><td>Number of partner collections</td><td class="num">11</td><td>10 NFT lenders + 1 headline (Pudgy is its own row)</td></tr>
+      <tr><td>Total NFTs lent</td><td class="num">77</td><td>2 + 11 + 24 + 40 across the four tiers</td></tr>
+      <tr><td><code>TOTAL_VALUE_USD</code></td><td class="num">$74,288</td><td>Sum of (count × floor)</td></tr>
+      <tr><td>Tier threshold — headline</td><td class="num">≥ $5,000 floor</td><td>Only Pudgy qualifies</td></tr>
+      <tr><td>Tier threshold — high</td><td class="num">$1,500–$5,000</td><td>Azuki, MAYC, Quirkies, Moonbirds</td></tr>
+      <tr><td>Tier threshold — mid</td><td class="num">$500–$1,500</td><td>Lil Pudgys, GVC, Doodles, Rektguy</td></tr>
+      <tr><td>Tier threshold — low</td><td class="num">&lt; $500</td><td>Sappy Seals, Normies</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D2. Campaign structure (<code>gacha_config.py</code>)</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>n_pulls_per_campaign</code></td><td class="num">1,000</td><td>Target weekly demand</td></tr>
+      <tr><td><code>snapshot_interval</code></td><td class="num">200 pulls</td><td>For demand-shortfall snapshots</td></tr>
+      <tr><td>Campaign duration</td><td>1 week</td><td>Single settlement at end</td></tr>
+      <tr><td>Multi-week dynamics</td><td>independent</td><td>No carryover modeled</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D3. Pricing (<code>industry_calibrated</code> variant)</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>box_price_usd</code></td><td class="num">$990</td><td>Regular price (boxes 201+)</td></tr>
+      <tr><td><code>presale_box_price_usd</code></td><td class="num">$900</td><td>Pre-sale rate (boxes 1–200)</td></tr>
+      <tr><td><code>presale_pulls</code></td><td class="num">200</td><td>Pre-sale window length</td></tr>
+      <tr><td>Refund-guarantee threshold</td><td class="num">200 paid pre-orders</td><td>External policy, not in simulator code</td></tr>
+      <tr><td>Implied edge (regular)</td><td class="num">~12.1%</td><td>(box - EV) / box</td></tr>
+      <tr><td>Implied edge (pre-sale)</td><td class="num">~3.3%</td><td>Thin margin — derisks cold start</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D4. Pull outcome probabilities</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>p_tier_headline</code></td><td class="num">1.0%</td><td>Pudgy hit per box</td></tr>
+      <tr><td><code>p_tier_high</code></td><td class="num">15.0%</td><td>Sums uniformly across 11 NFTs</td></tr>
+      <tr><td><code>p_tier_mid</code></td><td class="num">32.0%</td><td>Sums uniformly across 24 NFTs</td></tr>
+      <tr><td><code>p_tier_low</code></td><td class="num">32.0%</td><td>Sums uniformly across 40 NFTs</td></tr>
+      <tr><td><code>p_consolation</code></td><td class="num">20.0%</td><td>1 shard (non-NFT outcome)</td></tr>
+      <tr><td>Sum check</td><td class="num">100%</td><td>Sampled via Categorical(4 NFT tiers + consolation)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D5. Auto-buyback mechanics</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>auto_buyback_discount</code></td><td class="num">8%</td><td>User receives 92% of floor on instant-sell</td></tr>
+      <tr><td><code>p_accept_buyback_headline</code></td><td class="num">5%</td><td>Pudgy hits almost always kept</td></tr>
+      <tr><td><code>p_accept_buyback_high</code></td><td class="num">25%</td><td>High-tier mostly kept</td></tr>
+      <tr><td><code>p_accept_buyback_mid</code></td><td class="num">60%</td><td>Mid-tier mostly sold back</td></tr>
+      <tr><td><code>p_accept_buyback_low</code></td><td class="num">85%</td><td>Low-tier dumped (Beezie-zone)</td></tr>
+      <tr><td><code>buyback_acceptance_scale</code></td><td class="num">1.0</td><td>Sensitivity multiplier (uniform across tiers)</td></tr>
+      <tr><td>Implied blended acceptance</td><td class="num">~62%</td><td>Σ p_tier × p_accept(tier)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D6. Shards / consolation</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>shards_per_box</code></td><td class="num">5</td><td>5 shards = 1 free box redemption</td></tr>
+      <tr><td><code>shard_redemption_rate</code></td><td class="num">100%</td><td>Conservative — assumes every shard eventually redeems</td></tr>
+      <tr><td>Perceived value per shard</td><td class="num">$198</td><td>= box_price / shards_per_box ($990/5)</td></tr>
+      <tr><td>Operator cost per shard</td><td class="num">$198</td><td>= perceived × redemption_rate</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D7. Restock mechanic</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>restock_enabled</code></td><td>True</td><td>Master flag</td></tr>
+      <tr><td><code>restock_threshold</code></td><td class="num">50%</td><td>Triggers when total pool &lt; 50% × 77 = 38 NFTs</td></tr>
+      <tr><td><code>headline_empty_triggers_restock</code></td><td>True</td><td>Auxiliary trigger when both Pudgies are out</td></tr>
+      <tr><td>Restock target</td><td>full top-up</td><td>Restore every slug to its original count</td></tr>
+      <tr><td>Affordability check</td><td>all-or-nothing</td><td>Skip if cashbox &lt; total restock cost</td></tr>
+      <tr><td><code>depleted_tier_policy</code></td><td>reroll</td><td>If sampled tier is empty, redraw from non-empty tiers</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D8. Settlement waterfall</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>initial_cashbox_usd</code></td><td class="num">$25,000</td><td>Rarible's working-capital buffer</td></tr>
+      <tr><td><code>operator_fee_share</code></td><td class="num">50%</td><td>Off the top of profit</td></tr>
+      <tr><td><code>use_pro_rata_capital_split</code></td><td>True</td><td>Post-fee profit split by capital contribution</td></tr>
+      <tr><td>Rarible pro-rata weight (as lender)</td><td class="num">25.18%</td><td>$25k / ($25k + $74.3k)</td></tr>
+      <tr><td>External lender pro-rata weight</td><td class="num">74.82%</td><td>$74.3k / ($25k + $74.3k)</td></tr>
+      <tr><td><strong>Rarible total profit share</strong></td><td class="num"><strong>62.59%</strong></td><td>50% + 50% × 25.18%</td></tr>
+      <tr><td><strong>External lender total profit share</strong></td><td class="num"><strong>37.41%</strong></td><td>50% × 74.82%</td></tr>
+      <tr><td>Senior debt allocation</td><td>pro-rata by consumed $</td><td>Each lender repaid in proportion to their NFTs consumed</td></tr>
+      <tr><td>Profit allocation</td><td>pro-rata by principal</td><td>Each lender shares profit by their initial $-share</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D9. Stress-test parameters</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>floor_shock</code></td><td>None / tuple</td><td>(pull_idx, slug, multiplier) for one-shot floor shock</td></tr>
+      <tr><td>Tested shock scenarios</td><td>Pudgy +50/+100/-50%</td><td>Applied at pull 500 (mid-campaign)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D10. Simulation parameters</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th class="num">Value</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>n_paths</code> (full sim)</td><td class="num">1,000</td><td>Used for the main pitch-deck numbers</td></tr>
+      <tr><td><code>n_paths</code> (low-volume sweep)</td><td class="num">2,000</td><td>Tighter percentiles on rare cap-loss events</td></tr>
+      <tr><td><code>n_paths</code> (sensitivity sweep)</td><td class="num">500</td><td>Faster turnaround across 7 levers × 5 values</td></tr>
+      <tr><td><code>seed</code></td><td class="num">42</td><td>Deterministic reproducibility</td></tr>
+      <tr><td>Random engine</td><td>NumPy <code>default_rng</code></td><td>PCG64 underlying</td></tr>
+    </tbody>
+  </table>
+
+  <h3>D11. Per-collection inventory contributions (frozen)</h3>
+  <table>
+    <thead><tr><th>Slug</th><th>Display</th><th>Tier</th><th class="num">Floor (USD)</th><th class="num">Count lent</th><th class="num">Lent value</th></tr></thead>
+    <tbody>
+      <tr><td><code>pudgy_penguins</code></td><td>Pudgy Penguins</td><td>headline</td><td class="num">$10,191</td><td class="num">2</td><td class="num">$20,382</td></tr>
+      <tr><td><code>azuki</code></td><td>Azuki</td><td>high</td><td class="num">$1,786</td><td class="num">4</td><td class="num">$7,144</td></tr>
+      <tr><td><code>mayc</code></td><td>MAYC (BAYC eco.)</td><td>high</td><td class="num">$2,106</td><td class="num">3</td><td class="num">$6,318</td></tr>
+      <tr><td><code>quirkies</code></td><td>Quirkies</td><td>high</td><td class="num">$2,338</td><td class="num">2</td><td class="num">$4,676</td></tr>
+      <tr><td><code>moonbirds</code></td><td>Moonbirds</td><td>high</td><td class="num">$2,043</td><td class="num">2</td><td class="num">$4,086</td></tr>
+      <tr><td><code>lil_pudgys</code></td><td>Lil Pudgys (Pudgy eco.)</td><td>mid</td><td class="num">$1,236</td><td class="num">5</td><td class="num">$6,180</td></tr>
+      <tr><td><code>good_vibes_club</code></td><td>Good Vibes Club</td><td>mid</td><td class="num">$1,453</td><td class="num">4</td><td class="num">$5,812</td></tr>
+      <tr><td><code>doodles</code></td><td>Doodles</td><td>mid</td><td class="num">$1,158</td><td class="num">5</td><td class="num">$5,790</td></tr>
+      <tr><td><code>rekt</code></td><td>Rektguy</td><td>mid</td><td class="num">$562</td><td class="num">10</td><td class="num">$5,620</td></tr>
+      <tr><td><code>sappy_seals</code></td><td>Sappy Seals</td><td>low</td><td class="num">$290</td><td class="num">20</td><td class="num">$5,800</td></tr>
+      <tr><td><code>normies</code></td><td>Normies</td><td>low</td><td class="num">$124</td><td class="num">20</td><td class="num">$2,480</td></tr>
+      <tr><td colspan="4"><strong>TOTAL</strong></td><td class="num"><strong>77</strong></td><td class="num"><strong>$74,288</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>D12. Structural assumptions NOT in the model</h3>
+  <p>These are real risks that the simulator does not capture. They're flagged here so reviewers know the limits of the analysis.</p>
+  <ul>
+    <li><strong>Floor-price volatility within a campaign</strong> — prices held constant except in explicit stress tests (§12)</li>
+    <li><strong>ETH/USD volatility</strong> — locked at snapshot rate ($2,106)</li>
+    <li><strong>Demand stochasticity</strong> — pull count is deterministic; we don't model variance in actual user volume</li>
+    <li><strong>Gas, opex, CAC, marketing spend</strong> — not subtracted from operator P&amp;L</li>
+    <li><strong>Bad-actor behavior</strong> — no Sybil resistance, no insider trading, no front-running</li>
+    <li><strong>Open-market restock slippage</strong> — every restock executes at floor instantly</li>
+    <li><strong>Multi-week carryover</strong> — campaigns treated as independent; no learning effects across weeks</li>
+    <li><strong>User-acceptance correlation</strong> — assumed independent Bernoulli across pulls; no herding or learning</li>
+    <li><strong>Acceptance-rate dependence on discount</strong> — model holds acceptance constant when discount changes (in practice a wider discount would push acceptance down marginally)</li>
+    <li><strong>Pudgy floor as systemic risk</strong> — 27% of pool value sits in one collection; a structural Pudgy event isn't modeled beyond the §12 shock test</li>
+  </ul>
+</section>
+
+</main>
+
+<script>
+  const sections = Array.from(document.querySelectorAll('section[id]'));
+  const links = Array.from(document.querySelectorAll('nav.sidebar a'));
+  const linkById = Object.fromEntries(
+    links.map(a => [a.getAttribute('href').slice(1), a])
+  );
+
+  function onScroll() {
+    const fromTop = window.scrollY + 80;
+    let current = sections[0];
+    for (const s of sections) {
+      if (s.offsetTop <= fromTop) current = s;
+    }
+    links.forEach(a => a.classList.remove('active'));
+    const l = linkById[current.id];
+    if (l) l.classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + id);
+      }
+    });
+  });
+</script>
+</body>
+</html>
