@@ -1,0 +1,6 @@
+slug,display_name,symbol,floor_sol,floor_usd,count_lent,lent_value_usd,lent_value_sol,share_value_pct,share_count_pct,tier,sol_usd_rate,source,fetched_at
+galactic_geckos,Galactic Gecko Space Garage,galactic_geckos,6.753,547.19559,15,8207.933850000001,101.295,22.199551603903636,16.304347826086957,mid,81.03,magic-eden-stats,2026-05-28T09:47:04+00:00
+mad_lads,Mad Lads,mad_lads,6.1,494.28299999999996,15,7414.244999999999,91.5,20.052904602963444,16.304347826086957,mid,81.03,magic-eden-stats,2026-05-28T09:47:04+00:00
+okay_bears,Okay Bears,okay_bears,1.8245,147.839235,50,7391.96175,91.225,19.99263631044088,54.34782608695652,low,81.03,magic-eden-stats,2026-05-28T09:47:04+00:00
+smb,Solana Monkey Business,solana_monkey_business,17.586,1424.9935799999998,5,7124.9679,87.92999999999999,19.270512587306836,5.434782608695652,high,81.03,magic-eden-stats,2026-05-28T09:47:04+00:00
+claynosaurz,Claynosaurz,claynosaurz,12.049,976.33047,7,6834.31329,84.34299999999999,18.484394895385204,7.608695652173913,high,81.03,magic-eden-stats,2026-05-28T09:47:04+00:00
